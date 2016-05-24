@@ -1,0 +1,7 @@
+./download_snv
+./download_indel
+
+./do_process_snv
+./do_process_indel
+
+./merge_snv

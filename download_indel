@@ -1,0 +1,8 @@
+#!/bin/bash
+
+readonly INPUTDIR=/oicr/data/pancanxfer/OxoG_workflow_variants/v1/
+readonly OUTPUTDIR=./input_vcfs/raw/indel
+
+mkdir -p ${OUTPUTDIR}
+
+find ${INPUTDIR} -name "*_annotated*indel*vcf.gz*" -exec ln -s {} ${OUTPUTDIR} \;

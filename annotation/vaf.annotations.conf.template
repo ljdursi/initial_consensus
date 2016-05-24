@@ -1,0 +1,5 @@
+[[annotation]]
+file="/oicr/data/pancanxfer/consensus/initial_consensus/vafs/@@SAMPLE@@.mutect_counts.vcf.gz"
+fields = ["VAF", "t_alt_count", "t_ref_count"]
+names = ["VAF", "t_alt_count", "t_ref_count"]
+ops = ["self", "self", "self"]

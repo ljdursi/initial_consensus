@@ -1,0 +1,53 @@
+#!/bin/bash
+
+module load tabix/0.2.6
+
+readonly OUTDIR=./input_vcfs/processed/snv_mnv
+readonly INDIR=./input_vcfs/raw/snv_mnv
+
+mkdir -p "$OUTDIR"
+
+function newname {
+    local file=$1
+    local caller=$2
+    local base=$( basename $file )
+    if [[ $base == *".vcf.gz" ]]
+    then
+        ext="vcf.gz"
+    else
+        ext="vcf.gz.tbi"
+    fi
+    sample=$( echo $base | cut -f 1 -d . )
+    echo ${sample}.${caller}.snv_mnv.${ext}
+}
+
+for file in "${INDIR}"/*broad*snv*
+do 
+    newfile=$( newname $file broad )
+    cp $file ${OUTDIR}/${newfile}
+done
+
+for file in "${INDIR}"/*dkfz*
+do 
+    newfile=$( newname $file dkfz )
+    cp $file ${OUTDIR}/${newfile}
+done
+
+for file in "${INDIR}"/*svcp*vcf.gz
+do
+    newfile=$( newname $file sanger )
+    zcat "$file" \
+        | grep -v '=$' \
+        | bgzip > ${OUTDIR}/${newfile}
+    tabix -p vcf ${OUTDIR}/${newfile}
+done
+
+for file in "${INDIR}"/*MUSE*vcf.gz
+do
+    newfile=$( newname $file muse )
+    zcat "$file" \
+        | sed -e 's/Tier[0-9]/PASS/' \
+        | grep -v "OXOG_Fail=True" \
+        | bgzip > ${OUTDIR}/${newfile}
+    tabix -p vcf ${OUTDIR}/${newfile}
+done

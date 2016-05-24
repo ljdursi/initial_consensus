@@ -1,0 +1,15 @@
+#!/bin/bash
+
+readonly VARIANT=snv_mnv
+readonly INDIR=./vafs
+readonly OUTDIR=./annotated/${VARIANT}
+
+samples=$( ls ${INDIR} | grep -v ".tbi" | xargs -n1 basename | cut -f 1 -d . | sort | uniq )
+
+for sample in $samples
+do
+    echo $sample
+    qsub -cwd -e logs -o logs -N cv_${sample} \
+        -l h_vmem=2g \
+        ./scripts/caller_vafs.sh ${sample} ${VARIANT}
+done

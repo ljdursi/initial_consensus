@@ -1,0 +1,67 @@
+#!/bin/bash
+
+module load tabix/0.2.6
+
+readonly OUTDIR=./input_vcfs/processed/indel
+readonly INDIR=./input_vcfs/raw/indel
+readonly SMUFININDIR=/.mounts/labs/simpsonlab/users/jdursi/newsmufin/smufin_flat/
+readonly REFERENCE=/oicr/data/pancanxfer/ref/genome.fa
+readonly BCFTOOLS=/u/jdursi/sw/sga-extra/bcftools/bcftools
+
+mkdir -p "$OUTDIR"
+
+function newname {
+    local file=$1
+    local caller=$2
+    local base=$( basename $file )
+    if [[ $base == *".vcf.gz" ]]
+    then
+        ext="vcf.gz"
+    else
+        ext="vcf.gz.tbi"
+    fi
+    if [ $caller == "smufin" ]
+    then
+        sample=$( echo $base | cut -f 1 -d . )
+    else
+        sample=$( echo $base | cut -f 1 -d _ )
+    fi
+    echo ${sample}.${caller}.indel.${ext}
+}
+
+if [ "foo" == "bar" ]
+then
+for file in "${INDIR}"/*broad*indel*gz
+do 
+    newfile=$( newname $file broad )
+    zcat $file \
+        | sed -e 's/		$/	.	.	./' \
+        | sed -e '/^[^#]/s/	[^	]*	[^	]*	[^	]*$//' \
+        | bgzip > ${OUTDIR}/${newfile}
+    tabix -p vcf ${OUTDIR}/${newfile}
+done
+
+for file in "${INDIR}"/*dkfz*
+do 
+    newfile=$( newname $file dkfz )
+    cp $file ${OUTDIR}/${newfile}
+done
+
+for file in "${INDIR}"/*sanger*vcf.gz
+do
+    newfile=$( newname $file sanger )
+    zcat "$file" \
+        | grep -v '=$' \
+        | bgzip > ${OUTDIR}/${newfile}
+    tabix -p vcf ${OUTDIR}/${newfile}
+done
+fi
+
+for file in "${SMUFININDIR}"/*smufin*vcf.gz
+do
+    newfilegz=$( newname $file smufin )
+    newfile=$( basename $newfilegz .gz )
+    $BCFTOOLS norm -c w -m -indels -O v -f ${REFERENCE} ${file} 2>> logs/norm.errs.txt > ${OUTDIR}/${newfile}
+    bgzip ${OUTDIR}/${newfile}
+    tabix -p vcf ${OUTDIR}/${newfile}.gz
+done
