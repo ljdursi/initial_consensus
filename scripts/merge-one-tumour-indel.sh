@@ -27,19 +27,26 @@ readonly dkfzfile=${INDIR}/${ID}.dkfz.${VARIANT}.vcf.gz
 readonly sangerfile=${INDIR}/${ID}.sanger.${VARIANT}.vcf.gz
 readonly smufinfile=${INDIR}/${ID}.smufin.${VARIANT}.vcf.gz  
 
-if [ ! -f $smufinfile ] || [ ! -f $broadfile ] || [ ! -f $dkfzfile ] || [ ! -f $sangerfile ]
+usetwo=0
+if [ ! -f $smufinfile ] || [ ! -f $broadfile ]
 then
-    >&2 echo "files missing: one of ${smufinfile} ${broadfile} ${dkfzfile} ${sangerfile} not found"
+    >&2 echo "files missing: one of ${smufinfile} ${broadfile}.  Merging just two core callers"
+    usetwo=1
+fi
+
+if [ ! -f $dkfzfile ] || [ ! -f $sangerfile ]
+then
+    >&2 echo "manditory files missing: one of ${dkfzfile} ${sangerfile} not found"
     usage
 fi
 
 readonly OUTDIR=merged/${VARIANT}
 mkdir -p ${OUTDIR}
 
-newest=$smufinfile
-if [[ $broadfile -nt $newest ]]; then newest=$broadfile; fi
-if [[ $dkfzfile -nt $newest ]]; then newest=$dkfzfile; fi
+newest=$dkfzfile
 if [[ $sangerfile -nt $newest ]]; then newest=$sangerfile; fi
+if [[ $usetwo == 0 ]] && [[ $broadfile -nt $newest ]]; then newest=$broadfile; fi
+if [[ $usetwo == 0 ]] && [[ $smufinfile -nt $newest ]]; then newest=$smufinfile; fi
 
 readonly outfile=${OUTDIR}/${ID}.merged.${VARIANT}.vcf
 
@@ -49,10 +56,18 @@ then
     exit 1
 fi
 
-mergevcf -l broad,dkfz,sanger,smufin \
-    ${broadfile} ${dkfzfile} ${sangerfile} ${smufinfile} \
-    --ncallers \
-    -o ${outfile}.tmp
+if [ $usetwo == 0 ]
+then
+    mergevcf -l broad,dkfz,sanger,smufin \
+        ${broadfile} ${dkfzfile} ${sangerfile} ${smufinfile} \
+        --ncallers \
+        -o ${outfile}.tmp
+else
+    mergevcf -l dkfz,sanger \
+        ${dkfzfile} ${sangerfile} \
+        --ncallers \
+        -o ${outfile}.tmp
+fi
 
 grep "^#" ${outfile}.tmp > ${outfile}
 grep -v "^#" ${outfile}.tmp \
