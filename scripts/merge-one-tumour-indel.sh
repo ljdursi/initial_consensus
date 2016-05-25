@@ -76,5 +76,6 @@ grep -v "^#" ${outfile}.tmp \
     >> ${outfile}
 rm ${outfile}.tmp
 
+rm -f ${outfile}.gz ${outfile}.gz.tbi
 bgzip ${outfile}
 tabix -p vcf ${outfile}.gz
