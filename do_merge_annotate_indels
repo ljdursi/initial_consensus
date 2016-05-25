@@ -1,0 +1,20 @@
+#!/bin/bash
+
+readonly VARIANT=indel
+readonly INDIR=./input_vcfs/processed/${VARIANT}
+readonly OUTDIR=./annotated/${VARIANT}
+
+samples=$( ls ${INDIR} | grep -v ".tbi" | xargs -n1 basename | cut -f 1 -d . | sort | uniq )
+
+for sample in $samples
+do
+    newest_input=$( ls -t ${INDIR}/${sample}*vcf.gz | head -n 1 )
+    outfile=${OUTDIR}/${sample}.annotated.${VARIANT}.vcf.gz
+    if [ ! -f ${outfile} ] || [ ${newest_input} -nt ${outfile} ]
+    then
+        echo ${sample}
+        qsub -cwd -e logs -o logs -N ${VARIANT}_${sample} \
+            -l h_vmem=2g \
+            ./scripts/merge_and_annotate_one_indel.sh ${sample}
+    fi
+done
