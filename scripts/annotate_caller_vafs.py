@@ -172,7 +172,7 @@ def main():
             roundvafs = [round_three(vaf) for vaf in vafs]
             variant.INFO['caller_VAFs'] = roundvafs
 
-            variant.INFO['VAF'], variant.INFO['t_alt_count'], variant.INFO['t_depth'] = pick_best(vafs, dps, rcs)
+            variant.INFO['VAF'], variant.INFO['t_depth'], variant.INFO['t_alt_count'] = pick_best(vafs, dps, rcs)
 
         vcf_writer.write_record(variant)
 

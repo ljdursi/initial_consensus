@@ -5,6 +5,7 @@ module unuse /oicr/local/boutroslab/Modules/modulefiles
 module use /.mounts/labs/simpsonlab/modules/
 module load python/2.7.2
 module load gcc/4.8.1 openblas python-packages/2
+module load tabix/0.2.6
 
 readonly SAMPLE=$1
 readonly VARIANT=$2
@@ -62,13 +63,12 @@ module load gcc/4.8.1 openblas python-packages/2
 
 function addheaders {
     sed -e '/#CHROM/i\
-##INFO=<ID=VAFs,Number=.,Type=Float,Description="Variant Allele Fractions identified by callers, in order of callers in Callers record">\
-##INFO=<ID=DPs,Number=.,Type=Integer,Description="Total tumour depths by callers, in order of callers in Callers record">\
-##INFO=<ID=RCs,Number=.,Type=Integer,Description="Total alt-supporting read counts by callers, in order of callers in Callers record">\
-##INFO=<ID=medianVAF,Number=1,Type=Float,Description="median VAF identified by callers">\
-##INFO=<ID=weightedmeanVAF,Number=1,Type=Float,Description="sum of all seen alt read counts / sum of all depths">\
-##INFO=<ID=closest_depth,Number=1,Type=Integer,Description="depth from caller giving VAF closest to wmVAF">\
-##INFO=<ID=closest_readcount,Number=1,Type=Integer,Description="readcount from caller giving VAF closest to wmVAF">'
+##INFO=<ID=caller_VAFs,Number=.,Type=Float,Description="Variant Allele Fractions identified by callers, in order of callers in Callers record">\
+##INFO=<ID=caller_depths,Number=.,Type=Integer,Description="Total tumour depths by callers, in order of callers in Callers record">\
+##INFO=<ID=caller_variant_readcounts,Number=.,Type=Integer,Description="Total alt-supporting read counts by callers, in order of callers in Callers record">\
+##INFO=<ID=caller_VAF,Number=1,Type=Float,Description="median VAF identified by callers, ties broken by lowest depth, var count">\
+##INFO=<ID=t_depth,Number=1,Type=Integer,Description="depth from caller chosen for VAF">\
+##INFO=<ID=t_alt_count,Number=1,Type=Integer,Description="readcount from caller chosen for VAF">'
 }
 
 if [ ${VARIANT} == "snv_mnv" ]
@@ -88,4 +88,10 @@ else
         -i \
         | addheaders \
             > ${outputfile}
+fi
+
+if [ -f ${outputfile} ] && [ -s ${outputfile} ]
+then
+    bgzip ${outputfile}
+    tabix -p vcf ${outputfile}
 fi
