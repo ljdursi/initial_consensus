@@ -97,6 +97,35 @@ def populate_dict(filename, *args, **kwargs):
             depth_dict[key] = dp
     return vaf_dict, readcount_dict, depth_dict
 
+def pick_best(vafs, dps, rcs):
+    idxs = numpy.argsort(vafs)
+    assert len(vafs) == len(dps) == len(rcs)
+    nvafs = len(vafs)
+
+    # odd number: choose the median
+    if nvafs % 2 == 1:
+        best = idxs[(nvafs-1)//2]
+        return vafs[best], dps[best], rcs[best]
+
+    # even number: choose the best
+    case1 = nvafs // 2
+    case2 = case1 - 1
+
+    # in case of tie in depths, go by lowest read count:
+    if dps[case2] == dps[case1]:
+        if rcs[case2] < rcs[case1]:
+            best = case2
+        else:
+            best = case1
+    # otherwise go by lowest depth:
+    elif dps[case2] < dps[case1]:
+        best = case2
+    else:
+        best = case1
+
+    return vafs[best], dps[best], rcs[best]
+    
+
 def main():
     parser = argparse.ArgumentParser(description='Annotate merged vcf with VAF information where available')
     parser.add_argument('mergedvcf', type=argparse.FileType('r'), default=sys.stdin, help="Merged VCF file")
@@ -133,18 +162,17 @@ def main():
                 if key in rc_dict
                 if rc_dict[key] is not None]
 
-        if len(dps) > 0 and len(rcs) > 0 and len(vafs) > 0:
-            variant.INFO['DPs'] = dps
-            variant.INFO['RCs'] = rcs
-            inferred_vaf = numpy.sum(rcs)*1.0/numpy.sum(dps)
-            variant.INFO['weightedmeanVAF'] = round_three(inferred_vaf)
+        for oldkey in ['t_alt_count', 't_ref_count']:
+            if oldkey in variant.INFO:
+                del variant.INFO[oldkey]
 
-            vaf_diffs = numpy.abs(numpy.array(vafs) - inferred_vaf)
-            best_idx = numpy.argsort(vaf_diffs)[0]
-
+        if len(dps)==len(rcs) and len(rcs)==len(vafs) and len(vafs) > 0:
+            variant.INFO['caller_depths'] = dps
+            variant.INFO['caller_variant_readcounts'] = rcs
             roundvafs = [round_three(vaf) for vaf in vafs]
-            variant.INFO['VAFs'] = roundvafs
-            variant.INFO['medianVAF'] = round_three(numpy.median(vafs))
+            variant.INFO['caller_VAFs'] = roundvafs
+
+            variant.INFO['VAF'], variant.INFO['t_alt_count'], variant.INFO['t_depth'] = pick_best(vafs, dps, rcs)
 
         vcf_writer.write_record(variant)
 

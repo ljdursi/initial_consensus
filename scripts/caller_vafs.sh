@@ -36,12 +36,11 @@ then
     exit
 fi
 
-readonly ANNOTATED_DIR=./input_vcfs/oxog_v1/${VARIANT}
-readonly broad=${ANNOTATED_DIR}/${SAMPLE}_annotated_broad_SNV.vcf.gz
-readonly dkfz=${ANNOTATED_DIR}/${SAMPLE}_annotated_dkfz_embl_SNV.vcf.gz
-readonly muse=${ANNOTATED_DIR}/${SAMPLE}_annotated_muse_SNV.vcf.gz
-
-readonly sanger=${ANNOTATED_DIR}/${SAMPLE}_annotated_sanger_SNV.vcf.gz
+readonly ANNOTATED_DIR=./input_vcfs/raw/${VARIANT}
+readonly broad=${ANNOTATED_DIR}/${SAMPLE}.broad-mutect*.vcf.gz
+readonly dkfz=${ANNOTATED_DIR}/${SAMPLE}.dkfz-snvCalling*.vcf.gz
+readonly muse=${ANNOTATED_DIR}/${SAMPLE}.MUSE_1-0rc*.vcf.gz
+readonly sanger=${ANNOTATED_DIR}/${SAMPLE}.svcp_1*vcf.gz
 
 if [ ! -f $broad ] || [ ! -f $dkfz ] || [ ! -f $sanger ]
 then

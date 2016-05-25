@@ -1,5 +1,0 @@
-[[annotation]]
-file="oicr/data/pancanxfer/consensus/initial_consensus/input_vcfs/processed/indel/@@SAMPLE@@.broad.indel.vcf.gz"
-fields = ["TumorVAF", "NormalVAF", "TumorVarDepth", "TumorTotalDepth", "NormalVarDepth", "NormalTotalDepth", "RepeatRefCount"]
-names = ["TumorVAF", "NormalVAF", "TumorVarDepth", "TumorTotalDepth", "NormalVarDepth", "NormalTotalDepth", "RepeatRefCount"]
-ops = ["self", "self", "self"]
