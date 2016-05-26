@@ -47,7 +47,7 @@ do
         continue
     fi
 
-    outfile=${MERGEDIR}/${sample}.comparison.${variant} vcf
+    outfile=${MERGEDIR}/${sample}.comparison.${variant}.vcf
     mergevcf -l interim,new_mutect_vafs,new_caller_vafs \
         ${oldfile} ${newfile} ${newfile2} \
         --ncallers \
