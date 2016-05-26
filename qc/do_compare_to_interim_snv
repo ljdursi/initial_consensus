@@ -10,7 +10,7 @@ readonly VARIANT=snv_mnv
 readonly NEWDIR=/oicr/data/pancanxfer/consensus/initial_consensus/annotated/${VARIANT}
 readonly NEWDIR2=/oicr/data/pancanxfer/consensus/initial_consensus/annotated/caller_vafs/${VARIANT}
 readonly OLDDIR=/.mounts/labs/simpsonlab/users/jdursi/interim_consensus/results/${VARIANT}
-readonly MERGEDIR=./compare-to-interim/${VARIANT}
+readonly MERGEDIR=./qc/compare-to-interim/${VARIANT}
 
 mkdir -p ${MERGEDIR}
 
@@ -47,7 +47,7 @@ do
         continue
     fi
 
-    outfile=${MERGEDIR}/${sample}.comparison.${variant}.vcf
+    outfile=${MERGEDIR}/${sample}.comparison.${VARIANT}.vcf
     mergevcf -l interim,new_mutect_vafs,new_caller_vafs \
         ${oldfile} ${newfile} ${newfile2} \
         --ncallers \

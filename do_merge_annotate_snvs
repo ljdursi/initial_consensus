@@ -5,6 +5,9 @@ readonly INDIR=./input_vcfs/processed/${VARIANT}
 readonly OUTDIR=./annotated/${VARIANT}
 
 samples=$( ls ${INDIR} | grep -v ".tbi" | xargs -n1 basename | cut -f 1 -d . | sort | uniq )
+readonly LOGSDIR=logs/annotate_snvs
+
+mkdir -p ${LOGSDIR}
 
 for sample in $samples
 do
@@ -13,7 +16,7 @@ do
     if [ ! -f ${outfile} ] || [ ${newest_input} -nt ${outfile} ]
     then
         echo ${sample}
-        qsub -cwd -e logs -o logs -N ${VARIANT}_${sample} \
+        qsub -cwd -e ${LOGSDIR} -o ${LOGSDIR} -N ${VARIANT}_${sample} \
             -l h_vmem=2g \
             ./scripts/merge_and_annotate_one_snv.sh ${sample}
     fi

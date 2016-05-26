@@ -5,16 +5,18 @@ module load python/2.7.2
 module load gcc/4.8.1 openblas python-packages/2
 module load tabix/0.2.6
 
-readonly NEWDIR=/oicr/data/pancanxfer/consensus/initial_consensus/filtered/indel
-readonly OLDDIR=/.mounts/labs/simpsonlab/users/jdursi/interim_consensus/results/indel_normed
-readonly MERGEDIR=./compare-to-interim
+readonly VARIANT=${VARIANT}
+
+readonly NEWDIR=/oicr/data/pancanxfer/consensus/initial_consensus/filtered/${VARIANT}
+readonly OLDDIR=/.mounts/labs/simpsonlab/users/jdursi/interim_consensus/results/${VARIANT}
+readonly MERGEDIR=./qc/compare-to-interim/${VARIANT}
 
 samples=$( ls vafs | xargs -n1 basename | grep -v \.tbi | cut -f 1 -d . | sort | uniq )
 
 for sample in $samples
 do
-    oldfile=${OLDDIR}/${sample}.merged.somatic.indel_normed.vcf
-    newfile=${NEWDIR}/${sample}.consensus.indel.vcf.gz
+    oldfile=${OLDDIR}/${sample}.merged.somatic.indel_normed.vcf   #note! not VARIANT
+    newfile=${NEWDIR}/${sample}.consensus.${VARIANT}.vcf.gz
 
     if [ ! -f $newfile ] 
     then

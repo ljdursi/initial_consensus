@@ -24,30 +24,42 @@ function newname {
 for file in "${INDIR}"/*broad*snv*
 do 
     newfile=$( newname $file broad )
-    cp $file ${OUTDIR}/${newfile}
+    if [ ! -f ${OUTDIR}/${newfile} ] || [ ${file} -nt ${OUTDIR}/${newfile} ]
+    then
+        cp $file ${OUTDIR}/${newfile}
+    fi
 done
 
 for file in "${INDIR}"/*dkfz*
 do 
     newfile=$( newname $file dkfz )
-    cp $file ${OUTDIR}/${newfile}
+    if [ ! -f ${OUTDIR}/${newfile} ] || [ ${file} -nt ${OUTDIR}/${newfile} ]
+    then
+        cp $file ${OUTDIR}/${newfile}
+    fi
 done
 
 for file in "${INDIR}"/*svcp*vcf.gz
 do
     newfile=$( newname $file sanger )
-    zcat "$file" \
-        | grep -v '=$' \
-        | bgzip > ${OUTDIR}/${newfile}
-    tabix -p vcf ${OUTDIR}/${newfile}
-done
+    if [ ! -f ${OUTDIR}/${newfile} ] || [ ${file} -nt ${OUTDIR}/${newfile} ]
+    then
+        zcat "$file" \
+            | grep -v '=$' \
+            | bgzip > ${OUTDIR}/${newfile}
+        tabix -p vcf ${OUTDIR}/${newfile}
+    fi
+    done
 
 for file in "${INDIR}"/*MUSE*vcf.gz
 do
     newfile=$( newname $file muse )
-    zcat "$file" \
-        | sed -e 's/Tier[0-9]/PASS/' \
-        | grep -v "OXOG_Fail=True" \
-        | bgzip > ${OUTDIR}/${newfile}
-    tabix -p vcf ${OUTDIR}/${newfile}
+    if [ ! -f ${OUTDIR}/${newfile} ] || [ ${file} -nt ${OUTDIR}/${newfile} ]
+    then
+        zcat "$file" \
+            | sed -e 's/Tier[0-9]/PASS/' \
+            | grep -v "OXOG_Fail=True" \
+            | bgzip > ${OUTDIR}/${newfile}
+        tabix -p vcf ${OUTDIR}/${newfile}
+    fi
 done

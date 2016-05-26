@@ -13,6 +13,9 @@ then
 fi
 
 readonly MODEL=$1
+readonly LOGSDIR=logs/indel_models
+
+mkdir -p ${LOGSDIR}
 
 for inputfile in ${INDIR}/*gz
 do
@@ -21,7 +24,7 @@ do
     if [ ! -f ${outputfile} ] || [ ${inputfile} -nt ${outputfile} ]
     then
         echo $sample
-        qsub -cwd -e logs -o logs -N Model_${sample}_${VARIANT} \
+        qsub -cwd -e ${LOGSDIR} -o ${LOGSDIR} -N Model_${sample}_${VARIANT} \
             -l h_vmem=2g \
             ./scripts/apply_model.sh ${MODEL} $inputfile $outputfile
     fi
