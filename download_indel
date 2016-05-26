@@ -5,4 +5,4 @@ readonly OUTPUTDIR=./input_vcfs/raw/indel
 
 mkdir -p ${OUTPUTDIR}
 
-find ${INPUTDIR} -name "*_annotated*indel*vcf.gz*" -exec ln -s {} ${OUTPUTDIR} \;
+find ${INPUTDIR} -maxdepth 2 -name "*_annotated*indel*vcf.gz*" -exec ln -s {} ${OUTPUTDIR} \;

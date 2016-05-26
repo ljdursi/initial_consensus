@@ -5,7 +5,4 @@ readonly OUTPUTDIR=./input_vcfs/raw/snv_mnv
 
 mkdir -p ${OUTPUTDIR}
 
-#find ${INPUTDIR}/v2 -name "*.vcf.gz*" -exec ln -s {} ${OUTPUTDIR} \;
-
-mkdir -p ./input_vcfs/oxog_v1/snv_mnv
-find ${INPUTDIR}/v1 -name "*annotated*vcf.gz*" -exec ln -s {} ./input_vcfs/oxog_v1/snv_mnv \;
+find ${INPUTDIR}/v2 -name "*.vcf.gz*" -exec ln -s {} ${OUTPUTDIR} \;

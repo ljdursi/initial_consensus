@@ -4,4 +4,5 @@
 ./do_process_snv
 ./do_process_indel
 
-./merge_snv
+./do_fix_vafs
+./do_merge_annotate_snvs

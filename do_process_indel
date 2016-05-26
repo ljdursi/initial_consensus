@@ -29,11 +29,10 @@ function newname {
     echo ${sample}.${caller}.indel.${ext}
 }
 
-if [ "foo" == "bar" ]
-then
 for file in "${INDIR}"/*broad*indel*gz
 do 
     newfile=$( newname $file broad )
+    echo $newfile
     zcat $file \
         | sed -e 's/		$/	.	.	./' \
         | sed -e '/^[^#]/s/	[^	]*	[^	]*	[^	]*$//' \
@@ -44,21 +43,23 @@ done
 for file in "${INDIR}"/*dkfz*
 do 
     newfile=$( newname $file dkfz )
+    echo $newfile
     cp $file ${OUTDIR}/${newfile}
 done
 
 for file in "${INDIR}"/*sanger*vcf.gz
 do
     newfile=$( newname $file sanger )
+    echo $newfile
     zcat "$file" \
         | grep -v '=$' \
         | bgzip > ${OUTDIR}/${newfile}
     tabix -p vcf ${OUTDIR}/${newfile}
 done
-fi
 
 for file in "${SMUFININDIR}"/*smufin*vcf.gz
 do
+    echo $newfile
     newfilegz=$( newname $file smufin )
     newfile=$( basename $newfilegz .gz )
     $BCFTOOLS norm -c w -m -indels -O v -f ${REFERENCE} ${file} 2>> logs/norm.errs.txt > ${OUTDIR}/${newfile}
