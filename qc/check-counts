@@ -1,0 +1,20 @@
+#!/bin/bash
+
+for caller in "dkfz" "sanger" "broad"
+do
+    echo "$caller"
+    >&2 echo "$caller"
+    while read -r -a array
+    do
+        sample=${array[0]}
+        >&2 echo "$sample"
+        raw=${array[1]}
+        bcftools=${array[3]}
+        annotated=${array[2]}
+        nraw=$( zgrep -v "^#" $raw | awk '$7 ~ /PASS/ || $7 ~ /\./{n++} END{ print n }' )
+        nannotated=$( zgrep -vc "^#" $annotated )
+        nbcftools=$( zgrep -vc "^#" $bcftools )
+        delta=$(($nraw-$nannotated))
+        echo "${delta},${sample},${raw},${nraw},${bcftools},${nbcftools},${annotated},${nannotated}"
+    done < ${caller}.indels.txt
+done
