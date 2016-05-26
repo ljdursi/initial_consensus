@@ -35,4 +35,4 @@ then
     exit 1
 fi
 
-vcfanno -p 1 annotation/dbsnp.annotations.conf ${input_file} > ${output_file}
+vcfanno -p 1 annotation/dbsnp.annotations.conf ${input_file} | sed -e 's/255\.0/255/' > ${output_file}
