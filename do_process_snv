@@ -21,7 +21,7 @@ function newname {
     echo ${sample}.${caller}.snv_mnv.${ext}
 }
 
-for file in "${INDIR}"/*broad*snv*
+for file in "${INDIR}"/*broad*snv*vcf.gz
 do 
     newfile=$( newname $file broad )
     if [ ! -f ${OUTDIR}/${newfile} ] || [ ${file} -nt ${OUTDIR}/${newfile} ]
@@ -33,12 +33,15 @@ do
     fi
 done
 
-for file in "${INDIR}"/*dkfz*
+for file in "${INDIR}"/*dkfz*vcf.gz
 do 
     newfile=$( newname $file dkfz )
     if [ ! -f ${OUTDIR}/${newfile} ] || [ ${file} -nt ${OUTDIR}/${newfile} ]
     then
-        cp $file ${OUTDIR}/${newfile}
+        zcat "$file" \
+            | grep -v "OXOG_Fail=True" \
+            | bgzip > ${OUTDIR}/${newfile}
+        tabix -p vcf ${OUTDIR}/${newfile}
     fi
 done
 
@@ -49,6 +52,7 @@ do
     then
         zcat "$file" \
             | grep -v '=$' \
+            | grep -v "OXOG_Fail=True" \
             | bgzip > ${OUTDIR}/${newfile}
         tabix -p vcf ${OUTDIR}/${newfile}
     fi
