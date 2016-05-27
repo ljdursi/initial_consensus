@@ -26,7 +26,10 @@ do
     newfile=$( newname $file broad )
     if [ ! -f ${OUTDIR}/${newfile} ] || [ ${file} -nt ${OUTDIR}/${newfile} ]
     then
-        cp $file ${OUTDIR}/${newfile}
+        zcat "$file" \
+            | grep -v "OXOG_Fail=True" \
+            | bgzip > ${OUTDIR}/${newfile}
+        tabix -p vcf ${OUTDIR}/${newfile}
     fi
 done
 
