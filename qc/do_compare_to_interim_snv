@@ -17,4 +17,4 @@ ls vafs \
     | cut -f 1 -d . \
     | sort \
     | uniq \
-    | parallel -j 6 ./qc/compare_one_snv_to_interim.sh
+    | parallel -j ${NJOBS} ./qc/compare_one_snv_to_interim.sh

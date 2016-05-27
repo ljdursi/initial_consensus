@@ -11,7 +11,7 @@ fi
 
 readonly VARIANT=snv_mnv
 
-readonly NEWDIR=/oicr/data/pancanxfer/consensus/initial_consensus/annotated/${VARIANT}
+readonly NEWDIR=/oicr/data/pancanxfer/consensus/initial_consensus/filtered/${VARIANT}
 readonly OLDDIR=/.mounts/labs/simpsonlab/users/jdursi/interim_consensus/results/${VARIANT}
 readonly MERGEDIR=./qc/compare-to-interim/${VARIANT}
 

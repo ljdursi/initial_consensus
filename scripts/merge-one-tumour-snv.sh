@@ -43,7 +43,7 @@ if [[ $sangerfile -nt $newest ]]; then newest=$sangerfile; fi
 
 readonly outfile=${OUTDIR}/${ID}.merged.snv_mnv.vcf
 
-if [[ -f $outfile ]] && [[ $outfile -nt $newest ]]
+if [[ -f ${outfile}.gz ]] && [[ ${outfile}.gz -nt $newest ]]
 then
     >&2 echo "$0: ${outfile} exists and is newer than inputs; cowardly refusing to overwrite."
     exit 1

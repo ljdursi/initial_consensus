@@ -4,6 +4,9 @@ module load parallel
 
 readonly INDIR=annotated/snv_mnv
 readonly OUTDIR=filtered/snv_mnv
+readonly DEFNJOBS=6
+
+NJOBS=${1:-${DEFNJOBS}}
 
 mkdir -p ${OUTDIR}
 
@@ -31,6 +34,7 @@ function copy_and_reheader {
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
 EOF
     zgrep -v "^#" $file >> ${newdir}/${nogz}
+    rm -f ${newdir}/${nogz}.gz ${newdir}/${nogz}.gz.tbi
     bgzip ${newdir}/${nogz}
     tabix -p vcf ${newdir}/${nogz}.gz
 }
@@ -39,4 +43,4 @@ export -f copy_and_reheader
 
 find ${INDIR} -type f -name "*.gz" \
     | grep -vf blacklist.txt \
-    | parallel -j 2 copy_and_reheader {}
+    | parallel -j ${NJOBS} copy_and_reheader {}
