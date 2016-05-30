@@ -20,11 +20,11 @@ function newname {
     else
         ext="vcf.gz.tbi"
     fi
-    if [ $caller == "smufin" ]
+    if [[ $base =~ _indel.vcf.gz ]] 
     then
-        sample=$( echo $base | cut -f 1 -d . )
-    else
         sample=$( echo $base | cut -f 1 -d _ )
+    else
+        sample=$( echo $base | cut -f 1 -d . )
     fi
     echo ${sample}.${caller}.indel.${ext}
 }
@@ -32,37 +32,60 @@ function newname {
 for file in "${INDIR}"/*broad*indel*gz
 do 
     newfile=$( newname $file broad )
-    echo $newfile
-    zcat $file \
-        | sed -e 's/		$/	.	.	./' \
-        | sed -e '/^[^#]/s/	[^	]*	[^	]*	[^	]*$//' \
-        | bgzip > ${OUTDIR}/${newfile}
-    tabix -p vcf ${OUTDIR}/${newfile}
+    if [ ! -f ${OUTDIR}/${newfile} ] || [ ${file} -nt ${OUTDIR}/${newfile} ]
+    then
+        echo $newfile
+        zcat $file \
+            | sed -e 's/		$/	.	.	./' \
+            | sed -e '/^[^#]/s/	[^	]*	[^	]*	[^	]*$//' \
+            | bgzip -f > ${OUTDIR}/${newfile}
+        tabix -p vcf ${OUTDIR}/${newfile}
+    fi
 done
 
 for file in "${INDIR}"/*dkfz*
 do 
     newfile=$( newname $file dkfz )
-    echo $newfile
-    cp $file ${OUTDIR}/${newfile}
+    if [ ! -f ${OUTDIR}/${newfile} ] || [ ${file} -nt ${OUTDIR}/${newfile} ]
+    then
+        echo $newfile
+        cp $file ${OUTDIR}/${newfile}
+    fi
 done
 
 for file in "${INDIR}"/*sanger*vcf.gz
 do
     newfile=$( newname $file sanger )
-    echo $newfile
-    zcat "$file" \
-        | grep -v '=$' \
-        | bgzip > ${OUTDIR}/${newfile}
-    tabix -p vcf ${OUTDIR}/${newfile}
+    if [ ! -f ${OUTDIR}/${newfile} ] || [ ${file} -nt ${OUTDIR}/${newfile} ]
+    then
+        echo $newfile
+        zcat "$file" \
+            | grep -v '=$' \
+            | bgzip -f > ${OUTDIR}/${newfile}
+        tabix -p vcf ${OUTDIR}/${newfile}
+    fi
 done
 
 for file in "${SMUFININDIR}"/*smufin*vcf.gz
 do
-    echo $newfile
+    newfilegz=$( newname $file smufin )
+    if [ ! -f ${OUTDIR}/${newfilegz} ] || [ ${file} -nt ${OUTDIR}/${newfilegz} ]
+    then
+        newfile=$( basename $newfilegz .gz )
+        echo $newfile
+        $BCFTOOLS norm -c w -m -indels -O v -f ${REFERENCE} ${file} 2>> logs/norm.errs.txt > ${OUTDIR}/${newfile}
+        bgzip -f ${OUTDIR}/${newfile}
+        tabix -p vcf ${OUTDIR}/${newfile}.gz
+    fi
+done
+
+readonly NEWSMUFINDIR=../reannotate/annotated
+for file in $( ls "${NEWSMUFINDIR}"/*smufin*vcf.gz )
+do
     newfilegz=$( newname $file smufin )
     newfile=$( basename $newfilegz .gz )
+    echo $newfile
     $BCFTOOLS norm -c w -m -indels -O v -f ${REFERENCE} ${file} 2>> logs/norm.errs.txt > ${OUTDIR}/${newfile}
-    bgzip ${OUTDIR}/${newfile}
+    bgzip -f ${OUTDIR}/${newfile}
     tabix -p vcf ${OUTDIR}/${newfile}.gz
 done
