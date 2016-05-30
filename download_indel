@@ -6,3 +6,13 @@ readonly OUTPUTDIR=./input_vcfs/raw/indel
 mkdir -p ${OUTPUTDIR}
 
 find ${INPUTDIR} -maxdepth 2 -name "*_annotated*indel*vcf.gz*" -exec ln -s {} ${OUTPUTDIR} \;
+
+for file in /oicr/data/pancanxfer/consensus/reannotate/annotated/* 
+do
+    base=$( basename $file )
+    if [ -f "${OUTPUTDIR}/${base}" ]
+    then
+        rm ${OUTPUTDIR}/${base}
+    fi
+    ln -s ${file} ${OUTPUTDIR}
+done
