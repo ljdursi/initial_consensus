@@ -19,6 +19,7 @@ then
 fi
 
 readonly input_file=${INDIR}/${ID}.annotated.${VARIANT}.vcf
+readonly nbroad=$( grep -c broad ${input_file} )
 
 if [ ! -f $input_file ] 
 then
@@ -29,7 +30,14 @@ fi
 readonly OUTDIR=annotated/${VARIANT}
 mkdir -p $OUTDIR
 readonly output_file=${OUTDIR}/${variant}/${ID}.annotated.${VARIANT}.vcf
-sed -e "s/@@SAMPLE@@/${ID}/" annotation/vaf.indel.annotations.conf.template > annotation/vaf.indel.${ID}.conf
+if [[ $nbroad -eq 0 ]]
+then
+    template_file=annotation/vaf.indel.annotations-nobroad.conf.template 
+else
+    template_file=annotation/vaf.indel.annotations.conf.template 
+fi
+
+sed -e "s/@@SAMPLE@@/${ID}/" $template_file > annotation/vaf.indel.${ID}.conf
 
 if [[ -f $output_file ]] && [[ $outfile -nt $input_file ]]
 then
