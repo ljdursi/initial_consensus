@@ -38,6 +38,6 @@ then
 fi
 
 vcfanno -p 1 annotation/vaf.${ID}.conf ${input_file} > ${output_file}
-bgzip ${output_file}
+bgzip -f ${output_file}
 tabix -p vcf ${output_file}.gz
 rm annotation/vaf.${ID}.conf

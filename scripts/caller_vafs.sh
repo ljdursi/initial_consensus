@@ -92,6 +92,6 @@ fi
 
 if [ -f ${outputfile} ] && [ -s ${outputfile} ]
 then
-    bgzip ${outputfile}
+    bgzip -f ${outputfile}
     tabix -p vcf ${outputfile}
 fi
