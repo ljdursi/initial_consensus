@@ -17,7 +17,7 @@ do
     then
         echo ${sample}
         qsub -cwd -e ${LOGSDIR} -o ${LOGSDIR} -N ${VARIANT}_${sample} \
-            -l h_vmem=4g \
+            -l h_vmem=8g \
             ./scripts/merge_and_annotate_one_indel.sh ${sample}
     fi
 done

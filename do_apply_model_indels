@@ -2,8 +2,10 @@
 
 readonly VARIANT=indel
 readonly INDIR=./annotated/${VARIANT}
+readonly RAWDIR=./filtered/${VARIANT}_raw
 readonly OUTDIR=./filtered/${VARIANT}
 mkdir -p ${OUTDIR}
+mkdir -p ${RAWDIR}
 
 if [ $# -eq 0 ] || [ -z "$1" ] || [ ! -f "$1" ]
 then
@@ -21,11 +23,12 @@ for inputfile in ${INDIR}/*gz
 do
     sample=$( basename $inputfile | cut -f 1 -d . )
     outputfile=${OUTDIR}/${sample}.consensus.${VARIANT}.vcf  # note: no .gz, will get bgzipped anyway
+    raw_outputfile=${RAWDIR}/${sample}.consensus.${VARIANT}.vcf  
     if [ ! -f ${outputfile} ] || [ ${inputfile} -nt ${outputfile} ]
     then
         echo $sample
         qsub -cwd -e ${LOGSDIR} -o ${LOGSDIR} -N Model_${sample}_${VARIANT} \
-            -l h_vmem=2g \
-            ./scripts/apply_model.sh ${MODEL} $inputfile $outputfile
+            -l h_vmem=6g \
+            ./scripts/apply_model.sh ${MODEL} $inputfile $raw_outputfile $outputfile
     fi
 done
