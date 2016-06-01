@@ -31,6 +31,6 @@ Rscript --vanilla scripts/filter_calls_by_model.R $MODEL $INPUTVCF $RAWOUTPUTVCF
     && ./scripts/clean_indel_calls.py <( grep -v "##contig" $RAWOUTPUTVCF ) -o $OUTPUTVCF \
     && bgzip -f ${OUTPUTVCF} \
     && tabix -p vcf ${OUTPUTVCF}.gz \
-    && nin=$( zcat ${INPUTVCF}.gz | grep -v "^#" | grep -vc "Callers=broad;" ) \
+    && nin=$( zcat ${INPUTVCF} | grep -v "^#" | grep -vc "Callers=broad;" ) \
     && nout=$( zcat ${OUTPUTVCF}.gz | grep -vc "^#" ) \
     && if [ $nin -ne $nout ]; then echo "TRUNCATED: ${INPUTVCF} ${OUTPUTVCF}"; fi
