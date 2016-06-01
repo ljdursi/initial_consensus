@@ -10,18 +10,31 @@ mkdir -p ${RAWDIR}
 if [ $# -eq 0 ] || [ -z "$1" ] || [ ! -f "$1" ]
 then
     echo "$0 - Apply an ensemble model (provided) to indel VCFs"
-    echo "Usage: $0 modelfile"
+    echo "Usage: $0 modelfile [list-of-samples]"
     exit 
 fi
 
 readonly MODEL=$1
+readonly SAMPLESFILE=$2
 readonly LOGSDIR=logs/indel_models
 
 mkdir -p ${LOGSDIR}
 
-for inputfile in ${INDIR}/*gz
+if [ -z ${SAMPLESFILE} ] || [ ! -f ${SAMPLESFILE} ] 
+then
+    echo "Using all samples:"
+    samples=$( basename $inputfile | cut -f 1 -d . )
+else
+    samples=$( cat $SAMPLESFILE )
+fi
+
+for sample in $samples
 do
-    sample=$( basename $inputfile | cut -f 1 -d . )
+    inputfile=${INDIR}/${sample}.annotated.${VARIANT}.vcf.gz
+    if [ ! -f ${inputfile} ]
+    then
+        continue
+    fi
     outputfile=${OUTDIR}/${sample}.consensus.${VARIANT}.vcf  # note: no .gz, will get bgzipped anyway
     raw_outputfile=${RAWDIR}/${sample}.consensus.${VARIANT}.vcf  
     if [ ! -f ${outputfile} ] || [ ${inputfile} -nt ${outputfile} ]
