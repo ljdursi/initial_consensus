@@ -9,9 +9,9 @@ if (length(args)<3) {
     in.vcf <- args[2]    
     out.vcf <- args[3]    
     if (length(args) > 3) {
-        thresh <- 0.5
-    } else {
         thresh <- args[4]
+    } else {
+        thresh <- 0.66
     }
 }
 
