@@ -5,11 +5,13 @@ module load python/2.7.2
 module load gcc/4.8.1 openblas python-packages/2
 module load tabix/0.2.6
 
-readonly VARIANT=${VARIANT}
+readonly VARIANT=indel
 
 readonly NEWDIR=/oicr/data/pancanxfer/consensus/initial_consensus/filtered/${VARIANT}
-readonly OLDDIR=/.mounts/labs/simpsonlab/users/jdursi/interim_consensus/results/${VARIANT}
+readonly OLDDIR=/.mounts/labs/simpsonlab/users/jdursi/interim_consensus/results/${VARIANT}_normed
 readonly MERGEDIR=./qc/compare-to-interim/${VARIANT}
+
+mkdir -p ${MERGEDIR}
 
 samples=$( ls vafs | xargs -n1 basename | grep -v \.tbi | cut -f 1 -d . | sort | uniq )
 
