@@ -7,9 +7,12 @@ module load tabix/0.2.6
 
 readonly VARIANT=indel
 
-readonly NEWDIR=/oicr/data/pancanxfer/consensus/initial_consensus/filtered/${VARIANT}
+readonly DEFNEWDIR=/oicr/data/pancanxfer/consensus/initial_consensus/filtered/${VARIANT}
+readonly DEFMERGEDIR=./qc/compare-to-interim/${VARIANT}
+
 readonly OLDDIR=/.mounts/labs/simpsonlab/users/jdursi/interim_consensus/results/${VARIANT}_normed
-readonly MERGEDIR=./qc/compare-to-interim/${VARIANT}
+readonly NEWDIR=${NEWDIR:-${DEFNEWDIR}}
+readonly MERGEDIR=${MERGEDIR:-${DEFMERGEDIR}}
 
 mkdir -p ${MERGEDIR}
 
@@ -45,8 +48,12 @@ do
     fi
 
     outfile=${MERGEDIR}/${sample}.comparison.vcf
+#    mergevcf -l old,new \
+#        ${oldfile} <( zgrep -v "^##contig" ${newfile} ) \
+#        --ncallers \
+#        -o ${outfile}
     mergevcf -l old,new \
-        ${oldfile} <( zgrep -v "^##contig" ${newfile} ) \
+        ${oldfile} <( zcat ${newfile} | grep -v "^##" ) \
         --ncallers \
         -o ${outfile}
 done
