@@ -33,6 +33,12 @@ def main():
             if item in record.INFO:
                 new_info[item] = record.INFO[item]
 
+        if 'dbsnp_VP' in record.INFO:
+            qualbyte = int(record.INFO['dbsnp_VP'],16) & 255
+            somatic = (qualbyte & 2**5) > 0
+            if somatic:
+                new_info['dbsnp_somatic'] = True
+
         if ('TumorVarDepth' in record.INFO) and (record.INFO['TumorVarDepth'] > 0):
             new_info['t_vaf'] = record.INFO['TumorVAF']
             new_info['t_alt_count'] = record.INFO['TumorVarDepth']
