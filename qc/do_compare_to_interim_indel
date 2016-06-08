@@ -33,27 +33,31 @@ do
         echo "${sample}: old file not present"
         continue
     fi
-    echo -n ${sample}
-    newcalls=$( zgrep -cv "^#" $newfile )
-    oldcalls=$( grep -cv "^#" $oldfile )
-    if [ $newcalls -ne $oldcalls ]
-    then
-        echo ": mismatch number of calls (new: ${newcalls}, old: ${oldcalls})"
-    else
-        echo ""
-    fi
-    if [ ${newcalls} -eq 0 ] || [ ${oldcalls} -eq 0 ]
-    then
-        continue
-    fi
 
     outfile=${MERGEDIR}/${sample}.comparison.vcf
-#    mergevcf -l old,new \
-#        ${oldfile} <( zgrep -v "^##contig" ${newfile} ) \
-#        --ncallers \
-#        -o ${outfile}
-    mergevcf -l old,new \
-        ${oldfile} <( zcat ${newfile} | grep -v "^##" ) \
-        --ncallers \
-        -o ${outfile}
+    if [ ! -f ${outfile} ] || [ ${newfile} -nt ${outfile} ]
+    then
+        echo -n ${sample} 
+        newcalls=$( zgrep -cv "^#" $newfile )
+        oldcalls=$( grep -cv "^#" $oldfile )
+        if [ $newcalls -ne $oldcalls ]
+        then
+            echo ": mismatch number of calls (new: ${newcalls}, old: ${oldcalls})"
+        else
+            echo ""
+        fi
+        if [ ${newcalls} -eq 0 ] || [ ${oldcalls} -eq 0 ]
+        then
+            continue
+        fi
+
+    #    mergevcf -l old,new \
+    #        ${oldfile} <( zgrep -v "^##contig" ${newfile} ) \
+    #        --ncallers \
+    #        -o ${outfile}
+        mergevcf -l old,new \
+            ${oldfile} <( zcat ${newfile} | sed -e '2,13d' ) \
+            --ncallers \
+            -o ${outfile}
+    fi
 done
