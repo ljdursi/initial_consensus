@@ -37,7 +37,7 @@ do
         echo $newfile
         zcat $file \
             | sed -e 's/		$/	.	.	./' \
-            | sed -e '/^[^#]/s/	[^	]*	[^	]*	[^	]*$//' \
+            | sed -e '/[#]/s/	[	]*	[	]*	[	]*$//' \
             | bgzip -f > ${OUTDIR}/${newfile}
         tabix -p vcf ${OUTDIR}/${newfile}
     fi
@@ -86,6 +86,17 @@ do
     newfile=$( basename $newfilegz .gz )
     echo $newfile
     $BCFTOOLS norm -c w -m -indels -O v -f ${REFERENCE} ${file} 2>> logs/norm.errs.txt > ${OUTDIR}/${newfile}
+    bgzip -f ${OUTDIR}/${newfile}
+    tabix -p vcf ${OUTDIR}/${newfile}.gz
+done
+
+readonly LATESTSMUFINDIR=/oicr/data/pancanxfer/consensus/SMuFin_set-1_2710-patients/
+for file in $( ls "${LATESTSMUFINDIR}"/*smufin*vcf.gz )
+do
+    newfilegz=$( newname $file smufin )
+    newfile=$( basename $newfilegz .gz )
+    echo $newfile
+    $BCFTOOLS norm -c wx -m -indels -O v -f ${REFERENCE} <( zcat ${file} ) 2>> logs/norm.errs.txt > ${OUTDIR}/${newfile}
     bgzip -f ${OUTDIR}/${newfile}
     tabix -p vcf ${OUTDIR}/${newfile}.gz
 done
