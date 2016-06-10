@@ -51,12 +51,8 @@ do
             continue
         fi
 
-    #    mergevcf -l old,new \
-    #        ${oldfile} <( zgrep -v "^##contig" ${newfile} ) \
-    #        --ncallers \
-    #        -o ${outfile}
         mergevcf -l old,new \
-            ${oldfile} <( zcat ${newfile} | sed -e '2,13d' ) \
+            ${oldfile} <( zgrep -v "^##contig" ${newfile} ) \
             --ncallers \
             -o ${outfile}
     fi
