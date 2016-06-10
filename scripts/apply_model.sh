@@ -39,7 +39,7 @@ cat <<EOF > ${OUTPUTVCF}
 ##INFO=<ID=VAF,Number=1,Type=Float,Description="VAF from mutect read filter if available">
 ##INFO=<ID=t_alt_count,Number=1,Type=Integer,Description="Tumour alt count from mutect read filter if available">
 ##INFO=<ID=t_ref_count,Number=1,Type=Integer,Description="Tumour alt count from mutect read filter if available">
-##INFO=<ID=cosmic,Number=1,Type=String,Description="(first) cosmic ID if found, COSMICv76">
+##INFO=<ID=cosmic,Number=1,Type=String,Description="(first) cosmic ID if found, COSMICv77">
 ##INFO=<ID=dbsnp,Number=1,Type=String,Description="(first) dbSNP ID if found, build 147, All_20160408.vcf.gz">
 ##INFO=<ID=repeat_masker,Number=1,Type=String,Description="Repeat masker region if in one">
 ##FILTER=<ID=LOWSUPPORT,Description="Not enough support in consensus model">
